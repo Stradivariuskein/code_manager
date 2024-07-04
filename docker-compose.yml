@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+
+  nginx_proxy:
+    build:
+      context: ./nginx_proxy
+    volumes:
+      - ./nginx_proxy/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx_proxy/certs:/etc/nginx/certs
+    ports:
+      - "10443:443"
+    networks:
+      manager:
+        ipv4_address: 172.22.0.2
+      coders:
+        ipv4_address: 172.23.0.2
+
+
+  web:
+    build:
+      context: ./project_manager
+    volumes:
+      - ./project_manager:/app
+      - ./project_manager/db.sqlite3:/app/db.sqlite3
+    ports:
+      - "8000"
+    depends_on:
+      - nginx_proxy
+    networks:
+      manager:
+        ipv4_address: 172.22.0.3
+
+
+
+networks:
+  manager:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+  coders:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/24
