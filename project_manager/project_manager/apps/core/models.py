@@ -1,9 +1,8 @@
 from django.db import IntegrityError, models, transaction
-from project_manager.settings import PORTAINER_TOKEN, NETWORK_NAME
+from project_manager.settings import PORTAINER_TOKEN, NETWORK_NAME, PORTAINER_IP
 import requests
 import json
 
-# Create your models here.
 
 # entidad contenedor (renduntante?)
 class Container(models.Model):
@@ -21,7 +20,7 @@ class PortainerApi(models.Model):
     def send_request(self, path: str, method: str, headers: dict = {}, data: dict = None, params: dict = {}) -> dict:
         if path[0] == '/':
             path = path[1:]
-        url = "https://192.168.2.115:9443/api/endpoints/2/docker/" + path
+        url = f"https://{PORTAINER_IP}:9443/api/endpoints/2/docker/{path}"
         headers["X-API-Key"] = self.apiToken
 
         try:

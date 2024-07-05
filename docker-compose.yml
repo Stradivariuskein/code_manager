@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  nginx_proxy:
+  nginx_proxy_test:
     build:
       context: ./nginx_proxy
     volumes:
@@ -11,56 +11,54 @@ services:
     ports:
       - "10443:443"
     networks:
-      manager:
-        ipv4_address: 172.22.0.2 # ip to host
-      coders:
-        ipv4_address: 172.23.0.2
+      manager_test:
+        ipv4_address: 172.24.0.2 # ip to host
+      coders_test:
+        ipv4_address: 172.25.0.2
 
     environment:
-      - IP_TO_HOST=172.22.0.2 # ip por la cual se expone el servicio
-      - WEB_SERVER_IP=172.22.0.3 # ip del la pagina web
+      - IP_TO_HOST=172.24.0.2 # ip por la cual se expone el servicio
+      - WEB_SERVER_IP=172.24.0.3 # ip del la pagina web
 
+  portainer_test:
+      image: portainer/portainer-ce
+      container_name: portainer_test
+      restart: always
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - portainer_data_test:/data
+      networks:
+        manager_test:
+          ipv4_address: 172.24.0.4
 
-  web:
+  web_test:
     build:
       context: ./project_manager
     volumes:
       - ./project_manager:/app
-      - ./project_manager/db.sqlite3:/app/db.sqlite3
     depends_on:
-      - nginx_proxy
+      - nginx_proxy_test
+      - portainer_test
     networks:
-      manager:
-        ipv4_address: 172.22.0.3
+      manager_test:
+        ipv4_address: 172.24.0.3
     environment:
-      - PROXY_IP=172.22.0.2
-      - PORTAINER_IP=172.22.0.4
-
-
- portainer:
-    image: portainer/portainer-ce
-    container_name: portainer
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    networks:
-      manager:
-        ipv4_address: 172.22.0.4
+      - PROXY_IP=172.24.0.2
+      - PORTAINER_IP=172.24.0.4
 
 # Red con los servicios principales
 networks:
-  manager:
+  manager_test:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.22.0.0/24
+        - subnet: 172.24.0.0/24
 # Red con los contenedores de vscode
-  coders:
+  coders_test:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.23.0.0/24
+        - subnet: 172.25.0.0/24
 
 volumes:
-  portainer_data:
+  portainer_data_test:

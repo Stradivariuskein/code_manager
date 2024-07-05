@@ -32,9 +32,10 @@ DEBUG = True
 ALLOWED_HOSTS = ["192.168.2.115", "localhost", "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = []
 #add dinamic host
-
+PROXY_IP = os.getenv('PROXY_IP')
+print(f"proxy ip: {PROXY_IP}")
 try:
-    response = requests.get("http://172.22.0.2/host.json")
+    response = requests.get(f"http://{PROXY_IP}/host.json")
 
     if response.status_code == 200:
 
@@ -170,9 +171,10 @@ EXEMPT_URLS = [
 
 # my const
 
-PORTAINER_TOKEN = "ptr_y3xK4AabylVgHelFEKuyD7/xbxol4lMgrYm09lTiqBM="
 
+PORTAINER_TOKEN = "ptr_F1eKgocVceLcG5/mkBEB2oCGcX4GZQ8dkHLCc7Q3UJU="
+PORTAINER_IP = os.getenv('PORTAINER_IP')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-NETWORK_NAME = "docker_deploy_coders"
+NETWORK_NAME = "docker_deploy_coders_test"

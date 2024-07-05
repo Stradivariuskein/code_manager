@@ -1,0 +1,21 @@
+clonar repo
+docker compose up --build
+
+ctrl+c paramos los contenedores y iniciamos solo el del portainer
+docker start portainer
+
+exponemos el puerto correspondiente en mi caso 9443
+
+ingresamos al host de conteiner y creamos la cuenta admin
+porteriormente crearemos un nuevo token.
+
+unvaez creado el usuario de portainer dirigirse a arriba del todod a la derecha donde esta el nombre de usuario se desplegara un menu.
+my account>tokerns>add token
+escrivimos el nombre q quieran en mi caso puse project_manajer
+copiamos el token y lo pegamos en:
+project_manager/project_manager/settings.py
+
+y lo pegamos en la variable
+PORTAINER_TOKEN = your_token
+cambiar el NETWORK_NAME al nombre q se creo la red coders
+ej: NETWORK_NAME = project_manager_coders
