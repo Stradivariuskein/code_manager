@@ -7,8 +7,11 @@ ngrok http 172.22.0.2:443 2>&1 1>/tmp/ngrok.log &
 
 
 sleep 10
-
+#obtiene el dominio dinamico
 curl http://localhost:4040/api/tunnels > /usr/share/nginx/html/host.json
+
+# Reemplaza variables de entorno en el archivo de configuración
+envsubst '${WEB_SERVER_IP},${IP_TO_HOST}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
 
 nginx -g "daemon off;"

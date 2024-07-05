@@ -6,15 +6,19 @@ services:
     build:
       context: ./nginx_proxy
     volumes:
-      - ./nginx_proxy/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx_proxy/default.conf:/etc/nginx/conf.d/default.conf.template
       - ./nginx_proxy/certs:/etc/nginx/certs
     ports:
       - "10443:443"
     networks:
       manager:
-        ipv4_address: 172.22.0.2
+        ipv4_address: 172.22.0.2 # ip to host
       coders:
         ipv4_address: 172.23.0.2
+
+    environment:
+      - IP_TO_HOST=172.22.0.2 # ip por la cual se expone el servicio
+      - WEB_SERVER_IP=172.22.0.3 # ip del la pagina web
 
 
   web:
@@ -23,24 +27,40 @@ services:
     volumes:
       - ./project_manager:/app
       - ./project_manager/db.sqlite3:/app/db.sqlite3
-    ports:
-      - "8000"
     depends_on:
       - nginx_proxy
     networks:
       manager:
         ipv4_address: 172.22.0.3
+    environment:
+      - PROXY_IP=172.22.0.2
+      - PORTAINER_IP=172.22.0.4
 
 
+ portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      manager:
+        ipv4_address: 172.22.0.4
 
+# Red con los servicios principales
 networks:
   manager:
     driver: bridge
     ipam:
       config:
         - subnet: 172.22.0.0/24
+# Red con los contenedores de vscode
   coders:
     driver: bridge
     ipam:
       config:
         - subnet: 172.23.0.0/24
+
+volumes:
+  portainer_data:
