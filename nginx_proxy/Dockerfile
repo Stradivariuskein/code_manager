@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get install -y ngrok && \
     rm -rf /var/lib/apt/lists/*
 
-RUN ngrok config add-authtoken 2gw0k2h1c7MU36CTDkTOproxVg2_3srKKmSGwhevP2bkrVtak
+RUN ngrok config add-authtoken your_token
 
 # Hacer el script ejecutable
 RUN chmod +x /bin/entrypoint_ngrok.sh
