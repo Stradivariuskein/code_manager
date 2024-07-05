@@ -177,4 +177,4 @@ PORTAINER_IP = os.getenv('PORTAINER_IP')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-NETWORK_NAME = "docker_deploy_coders_test"
+NETWORK_NAME = "docker_deploy_coders"
