@@ -4,7 +4,7 @@ from .serializers import ProjectSerializer, ContainerSerializer, ProjectFactoryS
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from project_manager.settings import PORTAINER_TOKEN
+from project_manager.portainer_token import PORTAINER_TOKEN
 
 
 
@@ -18,27 +18,27 @@ class ProjectCreateView(APIView):
         print("################################")
         print(serializer.is_valid())
         if serializer.is_valid():
-            try:
-                name = serializer.validated_data['name']
+            # try:
+            name = serializer.validated_data['name']
 
-                password = serializer.validated_data.get('password', '123q123q')
-                port = serializer.validated_data['port']
-                enable_https = serializer.validated_data['enable_https']
-                print(f"""                      name: {name}
-                        pass: {password}
-                        port: {port}
-                        https: {enable_https}""")
-                factory = ProjectFactory()
-                print("create factory")
-                project = factory.create_project(name, password, port, enable_https)
-                print("normal response")
-                return Response({'status': 'Project created', 'project_id': project.id}, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                print(f"Error creating project\n{e}")
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        print(serializer.errors)  # Imprimir errores del serializador
+            password = serializer.validated_data.get('password', '123q123q')
+            port = serializer.validated_data['port']
+            enable_https = serializer.validated_data['enable_https']
+            print(f"""                      name: {name}
+                    pass: {password}
+                    port: {port}
+                    https: {enable_https}""")
+            factory = ProjectFactory()
+            print("create factory")
+            project = factory.create_project(name, password, port, enable_https)
+            print("normal response")
+            return Response({'status': 'Project created', 'project_id': project.id}, status=status.HTTP_201_CREATED)
+        #     except Exception as e:
+        #         print(f"Error creating project\n{e}")
+        #         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        # print(serializer.errors)  # Imprimir errores del serializador
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectStartView(APIView):

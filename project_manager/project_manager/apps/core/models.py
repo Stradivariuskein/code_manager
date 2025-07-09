@@ -1,7 +1,20 @@
 from django.db import IntegrityError, models, transaction
-from project_manager.settings import PORTAINER_TOKEN, NETWORK_NAME, PORTAINER_IP
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Max
+from project_manager.settings import NETWORK_NAME, PORTAINER_IP
+from apps.account.models import PortainerToken
+from time import sleep
 import requests
 import json
+from project_manager.portainer_token import PORTAINER_TOKEN
+
+
+# try:
+#     PORTAINER_TOKEN = PortainerToken.objects.all().first().token
+#     print(f"token: {PORTAINER_TOKEN}")
+# except:
+#     PORTAINER_TOKEN = None
+#     print(f"token: {None}")
 
 
 # entidad contenedor (renduntante?)
@@ -12,15 +25,75 @@ class Container(models.Model):
     ip = models.GenericIPAddressField(null=True)
     ports = models.CharField(max_length=400)
     status = models.CharField(max_length=50)
+
+
+
+
+class ExposePort(models.Model):
+    external_port = models.IntegerField(
+        unique=True,
+        validators=[
+            MinValueValidator(1),  # El puerto debe ser mayor o igual a 1
+            MaxValueValidator(65535),  # El puerto debe ser menor o igual al máximo permitido
+        ]
+    )
+    internal_port = models.IntegerField(
+        validators=[
+            MinValueValidator(1),  # El puerto debe ser mayor o igual a 1
+            MaxValueValidator(65535),  # El puerto debe ser menor o igual al máximo permitido
+        ],
+        null=True,  # Permitir valores nulos temporalmente
+    )
+    container = models.ForeignKey(
+        'Container',  # Suponiendo que el modelo del contenedor se llama `Container`
+        on_delete=models.CASCADE,  # Si el contenedor se borra, también se borra el puerto
+        related_name='expose_ports'  # Para acceder a los puertos expuestos desde el contenedor
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(external_port__gte=1) & models.Q(external_port__lte=65535),
+                name="valid_external_port_range"
+            ),
+            models.CheckConstraint(
+                check=models.Q(internal_port__gte=1) & models.Q(internal_port__lte=65535),
+                name="valid_internal_port_range"
+            ),
+        ]
+
+
+    def __str__(self):
+        return f"Expose Port {self.external_port}  Internal Port {self.internal_port} (Container: {self.container})"
     
 # maneja las peticiones acia la api
 class PortainerApi(models.Model):
     apiToken = models.CharField(max_length=100)
 
+    def get_endpoint(self) -> str:
+        url = f"https://{PORTAINER_IP}:9443/api/endpoints"
+        headers = {"X-API-Key": self.apiToken}
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        try:
+            body = response.json()
+        except ValueError:
+            body = None
+
+        if isinstance(body, list) and len(body) == 1:
+            return str(body[0]['Id'])
+        else:
+            raise Exception(f"Error en la solicitud: {response.status_code} {response.reason} {response.content}\n")
+
+
+
     def send_request(self, path: str, method: str, headers: dict = {}, data: dict = None, params: dict = {}) -> dict:
+
         if path[0] == '/':
             path = path[1:]
-        url = f"https://{PORTAINER_IP}:9443/api/endpoints/2/docker/{path}"
+        endpoint_id = self.get_endpoint()
+        url = f"https://{PORTAINER_IP}:9443/api/endpoints/{endpoint_id}/docker/{path}"
         headers["X-API-Key"] = self.apiToken
 
         try:
@@ -41,6 +114,7 @@ class PortainerApi(models.Model):
 
             # Verificar el código de estado de la respuesta
             if response.status_code >= 400:
+                
                 raise Exception(f"Error en la solicitud: {response.status_code} {response.reason} {response.content}\ndata:\n{data}")
 
             # Verificar el tipo de contenido de la respuesta
@@ -64,24 +138,35 @@ class PortainerApi(models.Model):
 
     def create_container(self, project_name: str, password: str, port: int, enable_https: bool=False) -> Container | None:
         if not project_name:
-            raise Exception("Error: project_name param is requiered")
+            raise Exception("Error creating container: project_name param is requiered")
         if not password:
             password = "123q123q"
         if isinstance(port, int):
-            if 10000 > port > 10100:
-                raise Exception("Error: invalid port valis port: 10000 - 10099")
+            if 8080 == port :
+                raise Exception("Error creating container: port 8080 is reserved for vscode")
         if enable_https:
             print("##############################################\n")
             print("Warning: experimantal function, not working redy")
             print("##############################################\n")
         params = {"name": project_name}
+
+        # calculate external port
+        max_port = ExposePort.objects.aggregate(Max('external_port'))
+
+        if max_port['external_port__max']:
+            external_port = max_port['external_port__max'] + 1
+        else:
+            external_port = 10002
+
+
+
         data = {
             
             "Image": "vscode:4.89.1-python3.10",
-            "ExposedPorts": { "8080/tcp": {} },
+            "ExposedPorts": { f"8080/tcp": {}, f"{port}/tcp": {} },
             "HostConfig": {
                 "NetworkMode": NETWORK_NAME,
-                "PortBindings": { "8080/tcp": [{ "HostPort": port }] },
+                "PortBindings": { f"{port}/tcp": [{ "HostPort": external_port }] },
                 "Binds": [
                     f"/home/mrkein/projects/{project_name}/workspace:/home/coder/workspace",
                     f"/home/mrkein/projects/{project_name}/config:/home/coder/.config",
@@ -92,14 +177,24 @@ class PortainerApi(models.Model):
                 f"PASSWORD={password}",
                 "PATH=/home/coder/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
                 f"HTTPS_ENABLED={enable_https}",
-                "APP_PORT=8080",
+                f"APP_PORT=8080",
             ],
             "User": "1000:1000"
         }
-
+        
         response = self.send_request("containers/create", "post", headers={}, data=data, params=params)
-        print(f"\n\n+++++ response content +++++++++\n\n{response}\n\n")
-        return response
+
+        self.run_container(response['Id'])
+        self.stop_container(response['Id'])
+
+        
+        sleep(5) #espera a q se cierre
+        
+
+        new_container = self.get_container(response['Id'])
+        new_port = ExposePort(external_port=external_port, internal_port=port, container=new_container)
+        new_port.save()
+        return new_container
    
 
     def run_container(self, container_id: str) -> bool:
@@ -159,18 +254,23 @@ class PortainerApi(models.Model):
             container.ip = None
         container.status = container_dic['State']['Status']
         container.ports = ''
+        print(container_dic)
         for _, ip_data in container_dic["NetworkSettings"]['Ports'].items():
             try:
                 for current_ip in ip_data:
                     container.ports += f",{current_ip['HostPort']}"
             except KeyError:
                 pass
+            except Exception as e:
+                print(f"errir inesperado[{type(e).__name__}]: {e}")
+            
         
         container.save()
 
 
         return container
 
+   
     #obtiene todos los contenedores
     def get_all(self):
         #url = "https://192.168.2.115:9443/api/endpoints/2/docker/containers/json"
@@ -197,11 +297,11 @@ class PortainerApi(models.Model):
                     pass
             print(f"\n\n\n\tcontainer {name} id: {container_id}")
             existent_container = Container.objects.filter(name=name).first()
-            
+            print(f"container name: {name}")
             if not existent_container:
                 existent_container = Container.objects.filter(dockerId=container_id).first()
                 if not existent_container:
-                    print(f"\tno existe[{existent_container}]")
+                    print(f"\tno existe[{existent_container}]", flush=True)
                     continue
                     new_container = Container(
                                             name=name,
@@ -255,33 +355,34 @@ class ProjectFactory:
 
     @staticmethod
     def validate_port(port: int):
-        if not (10000 <= port <= 10100):
-            raise ValueError("Error: invalid port. Valid port range: 10000 - 10100")
-        if Container.objects.filter(ports__contains=f",{port},").exists():
-            container = Container.objects.filter(ports__contains=f",{port},").first()
-            raise ValueError(f"Error: port {port} is already in use <br>{container.name}")
+        if port != 8080:
+           return True
+        raise ValueError("Error validating port: port 8080 is reserved for vscode")
 
     def create_project(self, name: str, password: str, port: int, enable_https: bool = False) -> Project:
          with transaction.atomic():
-            self.validate_port(port)
+            
+            if self.validate_port(port):
 
-            portainer_api = PortainerApi(apiToken=PORTAINER_TOKEN)
-            
-            container_data = portainer_api.create_container(name, password, port, enable_https)
-            # esto es para q cree las carpetas necesarioas primero hay q iniciarlo
-            portainer_api.run_container(container_data['Id'])
-            portainer_api.stop_container(container_data['Id'])
-            print("\n\n++++++++ project create ++++++++\n\n")
-            response = self.change_folders_owner()
-            print(response)
-            
-            portainer_api.run_container(container_data['Id'])
-            container = portainer_api.get_container(container_data['Id'])
-            
-            
-            project = Project.objects.create(name=name, container=container)
-            project.save()
-            return project
+                portainer_api = PortainerApi(apiToken=PORTAINER_TOKEN)
+                
+                new_container = portainer_api.create_container(name, password, port, enable_https)
+
+                
+                # esto es para q cree las carpetas necesarioas primero hay q iniciarlo
+                
+                
+                print("\n\n++++++++ project create ++++++++\n\n")
+                response = self.change_folders_owner()
+                print(response)
+                
+                portainer_api.run_container(new_container.dockerId)
+                container = portainer_api.get_container(new_container.dockerId)
+                
+                
+                project = Project.objects.create(name=name, container=container)
+                project.save()
+                return project
     
     # create and add conteiner to database
     def save_container(self, name: str, container_data: json) -> Container:
@@ -321,21 +422,22 @@ class ProjectFactory:
         portainer_api = PortainerApi(apiToken=PORTAINER_TOKEN)
 
         # Crear contenedor
-        try:
-            create_response = portainer_api.send_request(
-                path="containers/create",
-                method="POST",
-                data=container_data
-            )
-            container_id = create_response['Id']
-            
+        # try:
+        create_response = portainer_api.send_request(
+            path="containers/create",
+            method="POST",
+            data=container_data
+        )
+        container_id = create_response['Id']
+        
 
-            # Iniciar contenedor
-            start_response = portainer_api.send_request(
-                path=f"containers/{container_id}/start",
-                method="POST"
-            )
-            
-
-        except Exception as e:
-            print(f"Error: {e}\n\n+++ response change owner: {start_response}\n\n")
+        # Iniciar contenedor
+        start_response = portainer_api.send_request(
+            path=f"containers/{container_id}/start",
+            method="POST"
+        )
+        
+        print(f"change_owner_status: {start_response.content}")
+        return start_response
+        # except Exception as e:
+        #     print(f"Error: {e}\n\n+++ response change owner: {start_response}\n\n")

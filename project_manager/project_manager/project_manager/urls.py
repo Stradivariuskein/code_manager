@@ -25,6 +25,7 @@ urlpatterns = [
     path('app/', include('apps.frontend.urls')),
     path('account/', include('apps.account.urls')),
     path('api/', include('apps.projectApi.urls')),
+    path('wp/', include('apps.whatsapp_api.urls')),
 ]
 
 if DEBUG:

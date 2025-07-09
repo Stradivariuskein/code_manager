@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Imagen</title>
+</head>
+<body>
+    {% if image_url %}
+        <img src="{{ image_url }}" alt="Screenshot">
+    {% else %}
+        <p>No se pudo obtener la imagen.</p>
+    {% endif %}
+</body>
+</html>

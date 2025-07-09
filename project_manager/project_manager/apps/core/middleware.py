@@ -14,7 +14,7 @@ class LoginRequiredMiddleware:
 
     def process_request(self, request):
         # Lista de rutas que no requieren autenticación
-        exempt_urls = [reverse('login'),]# reverse('signup'), reverse('logout')]
+        exempt_urls = [reverse('login'),reverse('send_port'),]# reverse('signup'), reverse('logout')]
 
         # Añadir más rutas que no requieran autenticación si es necesario
         if hasattr(settings, 'EXEMPT_URLS'):

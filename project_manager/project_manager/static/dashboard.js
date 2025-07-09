@@ -66,19 +66,23 @@ async function renderProjects() {
         const tr = document.createElement('tr');
 
         const containerIdTd = document.createElement('td');
+        containerIdTd.setAttribute("data-label", "Docker ID")
         containerIdTd.textContent = project.container.dockerId.slice(-10);
         console.log(project.container.dockerId)
         tr.appendChild(containerIdTd);
 
         const nameTd = document.createElement('td');
+        nameTd.setAttribute("data-label", "Name")
         nameTd.textContent = project.name;
         tr.appendChild(nameTd);
 
         const imageIdTd = document.createElement('td');
+        imageIdTd.setAttribute("data-label", "Image ID")
         imageIdTd.textContent = project.container.imageId.slice(-10);
         tr.appendChild(imageIdTd);
 
         const ipTd = document.createElement('td');
+        ipTd.setAttribute("data-label", "IP")
         const link_code = document.createElement('a');
         link_code.textContent = project.container.ip;
         link_code.setAttribute("target","_blank");
@@ -87,41 +91,99 @@ async function renderProjects() {
         tr.appendChild(ipTd);
 
         const portsTd = document.createElement('td');
+        portsTd.setAttribute("data-label", "Ports")
         portsTd.textContent = project.container.ports;
         tr.appendChild(portsTd);
 
         const statusTd = document.createElement('td');
+        statusTd.setAttribute("data-label", "Status")
         statusTd.textContent = project.container.status;
         tr.appendChild(statusTd);
 
         const actionsTd = document.createElement('td');
+        actionsTd.setAttribute("data-label", "Actions");
+
+        // Crear el botón de los tres puntos
+        const dropdownButton = document.createElement('button');
+        dropdownButton.textContent = '⋮'; // Tres puntos verticales
+        dropdownButton.className = 'dropdown-button';
+        dropdownButton.onclick = function() {
+            dropdownContent.classList.toggle('show');
+        };
+
+        // Crear el contenedor para los botones dentro del dropdown
+        const dropdownContent = document.createElement('div');
+        dropdownContent.className = 'dropdown-content';
+
+        // Botón de Play
         const playButton = document.createElement('button');
         playButton.textContent = 'Play';
         playButton.onclick = function() {
             postRequest(`/api/project/${project.container.dockerId}/start/`);
         };
-        actionsTd.appendChild(playButton);
+        dropdownContent.appendChild(playButton);
+
+        // Botón de Stop
         const stopButton = document.createElement('button');
         stopButton.textContent = 'Stop';
         stopButton.onclick = function() {
             postRequest(`/api/project/${project.container.dockerId}/stop/`);
-        }
-        actionsTd.appendChild(stopButton);
+        };
+        dropdownContent.appendChild(stopButton);
+
+        // Botón de Restart
         const restartButton = document.createElement('button');
         restartButton.textContent = 'Restart';
         restartButton.onclick = function() {
             postRequest(`/api/project/${project.container.dockerId}/restart/`);
-        }
-        actionsTd.appendChild(restartButton);
+        };
+        dropdownContent.appendChild(restartButton);
+
+        // Botón de Delete
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
         deleteButton.onclick = function() {
             postRequest(`/api/project/${project.container.dockerId}/delete/`, method="DELETE");
-        }
-        actionsTd.appendChild(deleteButton);
-        tr.appendChild(actionsTd);
+        };
+        dropdownContent.appendChild(deleteButton);
 
+        // Añadir el botón de los tres puntos y el contenido del dropdown al <td>
+        actionsTd.appendChild(dropdownButton);
+        actionsTd.appendChild(dropdownContent);
+
+        // Añadir <td> a la fila
+        tr.appendChild(actionsTd);
         tbody.appendChild(tr);
+
+        // const actionsTd = document.createElement('td');
+        // actionsTd.setAttribute("data-label", "Actions")
+        // const playButton = document.createElement('button');
+        // playButton.textContent = 'Play';
+        // playButton.onclick = function() {
+        //     postRequest(`/api/project/${project.container.dockerId}/start/`);
+        // };
+        // actionsTd.appendChild(playButton);
+        // const stopButton = document.createElement('button');
+        // stopButton.textContent = 'Stop';
+        // stopButton.onclick = function() {
+        //     postRequest(`/api/project/${project.container.dockerId}/stop/`);
+        // }
+        // actionsTd.appendChild(stopButton);
+        // const restartButton = document.createElement('button');
+        // restartButton.textContent = 'Restart';
+        // restartButton.onclick = function() {
+        //     postRequest(`/api/project/${project.container.dockerId}/restart/`);
+        // }
+        // actionsTd.appendChild(restartButton);
+        // const deleteButton = document.createElement('button');
+        // deleteButton.textContent = 'Delete';
+        // deleteButton.onclick = function() {
+        //     postRequest(`/api/project/${project.container.dockerId}/delete/`, method="DELETE");
+        // }
+        // actionsTd.appendChild(deleteButton);
+        // tr.appendChild(actionsTd);
+
+        // tbody.appendChild(tr);
     });
 }
 
@@ -138,16 +200,20 @@ function createForm(event) {
     const form = document.createElement('form');
     form.innerHTML = `
         <div class="input-field">
+            <label>Proyect name</label>
             <input type="text" name="name" placeholder="Nombre del proyecto">
         </div>
         <div class="input-field">
-            <input type="text" name="password" placeholder="Contraseña">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Contraseña">
         </div>
         <div class="input-field">
+            <label>Enable https</label>
             <input type="checkbox" name="enable_https">
         </div>
         <div class="input-field">
-            <input type="number" name="port" placeholder="Port: 10000">
+            <label>Port</label>
+            <input type="number" name="port" placeholder="Port: 8000">
         </div>
         <button id="submit_btn" type="submit" class="btn solid">Enviar</button>
     `;
@@ -230,6 +296,18 @@ function handleClickOutsideCard(event) {
         document.removeEventListener('click', handleClickOutsideCard);
     }
 }
+
+
+window.onclick = function(event) {
+    if (!event.target.matches('.dropdown-button')) {
+        const dropdowns = document.querySelectorAll('.dropdown-content');
+        dropdowns.forEach(dropdown => {
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+};
 
 
 

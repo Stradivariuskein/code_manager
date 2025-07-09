@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SignIn&SignUp</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'register.css' %}" />
+    <script
+      src="https://kit.fontawesome.com/64d58efce2.js"
+      crossorigin="anonymous"
+    ></script>
+  
+  </head>
+  <body>
+    <div class="container">
+      <div class="forms-container">
+        <div class="signin-signup">
+        
+          <form method="post" class="sign-in-form">
+                <br>
+                <div class="signin-signup scrollable-container">
+                    <div class="fields-sing-up">
+                    <h2>Crear cuenta inicial</h2>
+                    {% if messages %}
+                        <ul style="color: red;">
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% csrf_token %}
+                    <label>Usuario:</label>
+                    <input type="text" name="username" required><br>
+
+                    <label>Contraseña:</label>
+                    <input type="password" name="password1" required><br>
+
+                    <label>Repetir contraseña:</label>
+                    <input type="password" name="password2" required><br>
+
+                    <hr>
+                    <h3>Portainer</h3>
+                    <p>Crea una cuenta de portainer</p>
+                    <a href="https://localhost:9443" target="_blank">Crear cuenta Portainer</a>
+                    <p>Haz click en get started para usar el entorno local</p>
+
+                    <img src="{% static 'img/get_started.png' %}" class="image" alt="">
+                    <br>
+
+                    <hr>
+                    <h3>Genera el token de portainer</h3>
+                    <p>Ingresa en el siguiente link y genera tu token</p>
+                    <a href="https://localhost:9443/#!/account" target="_blank">Get Token</a>
+                    <br>
+
+                    <img src="{% static 'img/get_acces_tokrn_ilustration.png' %}" class="image" alt="">
+                    <br>
+                    
+                    <p>Copie el token</p>
+                    <img src="{% static 'img/copy_token.png' %}" class="image" alt="Ilustracion de como copyar el token">
+                    <br>
+                    
+                    <p>Pegue el token</p>
+                    <label>Portainer Token:</label>
+                    <input type="text" name="token" required><br>
+                    <br>
+                    </div>
+                    <div class="button-background">
+                    <button type="submit">Crear cuenta</button>
+                    </div>
+                    
+                </div>
+                
+                
+          </form>
+        
+        </div>
+      </div>
+      <div class="panels-container">
+
+        <div class="panel left-panel">
+            <div class="content">
+                
+            </div>
+            <img src="{% static 'img/log.svg' %}" class="image" alt="">
+        </div>
+
+
+      </div>
+    </div>
+    <script src="{% static 'app.js' %}"></script>
+  </body>
+</html>
+

@@ -5,6 +5,7 @@ services:
   nginx_proxy:
     build:
       context: ./nginx_proxy
+    restart: always
     volumes:
       - ./nginx_proxy/default.conf:/etc/nginx/conf.d/default.conf.template
       - ./nginx_proxy/certs:/etc/nginx/certs
@@ -20,6 +21,7 @@ services:
       - IP_TO_HOST=172.22.0.2 # ip por la cual se expone el servicio
       - WEB_SERVER_IP=172.22.0.3 # ip del la pagina web
 
+
   portainer:
       image: portainer/portainer-ce
       container_name: portainer
@@ -27,13 +29,17 @@ services:
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - portainer_data:/data
+      ports:  
+        - "9443:9443"
       networks:
         manager:
           ipv4_address: 172.22.0.4
 
+
   web:
     build:
       context: ./project_manager
+    restart: always
     volumes:
       - ./project_manager:/app
     depends_on:
@@ -45,6 +51,7 @@ services:
     environment:
       - PROXY_IP=172.22.0.2
       - PORTAINER_IP=172.22.0.4
+      
 
 # Red con los servicios principales
 networks:

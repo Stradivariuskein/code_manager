@@ -7,20 +7,7 @@ import json
 
 
 def Dashboard(request):
-    # Datos que quieres enviar en la solicitud POST
-    # url = "https://192.168.2.115:9443/api/auth"
-    # data = {
-    #     'Username': 'mrkein',
-    #     'Password': '38996049Alan@#$'
-    # }
 
-    # Cabeceras de la solicitud, si es necesario (por ejemplo, para indicar que los datos están en formato JSON)
-    # headers = {
-    #     'Content-Type': 'application/json'
-    # }
-
-    # Enviar la solicitud POST
-    # response = requests.post(url, json=data, headers=headers, verify=False)
     portainertoken = "ptr_Mju7Q8S4eFxajVW2KQPTsvFJ5ycHD168P7PnfRNitKQ="
     url = "https://192.168.2.115:9443/api/endpoints/2/docker/containers/json"
     headers = {

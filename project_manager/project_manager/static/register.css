@@ -1,0 +1,129 @@
+:root {
+    --color-bg: #ffffff;
+    --color-bg-input: #f0f8ff;
+    --color-bg-input-focus: #e0f2ff;
+    --color-text: #333333;
+    --color-label: #555555;
+    --color-border: #dddddd;
+    --color-primary: #00aaff;
+    --color-primary-dark: #0077cc;
+    --color-error-bg: #ffdddd;
+    --color-error-text: #d8000c;
+    --color-box-shadow: rgba(0, 0, 0, 0.1);
+}
+
+.fields-sing-up {
+    padding: 5px;
+}
+
+.signin-signup {
+    top: 22%;
+    max-height: 98vh;
+    background-color: white;
+    box-shadow: 0 0 15px var(--color-box-shadow);
+    border: white;
+    border-radius: 12px;
+}
+
+.sign-in-form h2,
+.sign-in-form h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+}
+
+.sign-in-form hr {
+    border: 1px solid var(--color-border);
+    margin: 2rem 0;
+}
+
+.sign-in-form label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: var(--color-label);
+}
+
+.sign-in-form input[type="text"],
+.sign-in-form input[type="password"] {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-bg-input);
+    color: var(--color-text);
+}
+
+.sign-in-form input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: var(--color-bg-input-focus);
+}
+
+.sign-in-form button[type="submit"] {
+    position: sticky;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 500px;
+    padding: 0.9rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+
+.sign-in-form button[type="submit"]:hover {
+    background-color: var(--color-primary-dark);
+}
+
+
+/* Rectángulo blanco detrás del botón */
+.button-background {
+    position: sticky;
+    bottom: 0px;
+    width: 100%;
+    background-color: white;
+    z-index: 999;
+    padding: 5px;
+}
+
+.sign-in-form a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.sign-in-form a:hover {
+    text-decoration: underline;
+}
+
+.sign-in-form .image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px var(--color-box-shadow);
+}
+
+.sign-in-form ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.sign-in-form li {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    padding: 0.5rem;
+    margin-bottom: 0.3rem;
+    border-radius: 4px;
+}

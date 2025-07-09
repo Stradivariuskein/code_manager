@@ -17,6 +17,7 @@ import requests
 from requests.exceptions import ConnectionError
 
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,28 +30,16 @@ SECRET_KEY = 'django-insecure-u*vb3a&cq9r*xl^&69@5+&#yojux^f(y*!h%9fz_&f&xgkvz!i
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ["192.168.2.115", "localhost", "127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = []
+
 #add dinamic host
+
 PROXY_IP = os.getenv('PROXY_IP')
+HOST = os.getenv("NGROK_HOST")
+if HOST == None:
+    HOST = "https://test.test"
+
 print(f"proxy ip: {PROXY_IP}")
-try:
-    response = requests.get(f"http://{PROXY_IP}/host.json")
-
-    if response.status_code == 200:
-
-        data = json.loads(response.content)
-        host = data["tunnels"][0]["public_url"]
-        print(host)
-
-        ALLOWED_HOSTS.append(host.split('//')[1])
-
-
-        CSRF_TRUSTED_ORIGINS.append(host)
-    else:
-        print(f"errro server response status code [{response.status_code}]")
-except ConnectionError as e:
-    print(f"Error server not response [{type(e).__name__}]")
+ALLOWED_HOSTS = ["192.168.2.115", 'django', "localhost", "127.0.0.1", "code.alanluque.com"]
 
 
 # Application definition
@@ -64,8 +53,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'apps.core',
+    #'apps.core.apps.CoreConfig',
     'apps.account',
     'apps.projectApi',
+    'apps.whatsapp_api',
 ]
 
 MIDDLEWARE = [
@@ -166,15 +157,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EXEMPT_URLS = [
     # url q no se bloquean
     "auth_check",
+    "firstinit",
 ]
 
 
 # my const
 
 
-PORTAINER_TOKEN = "ptr_F1eKgocVceLcG5/mkBEB2oCGcX4GZQ8dkHLCc7Q3UJU="
+
+
 PORTAINER_IP = os.getenv('PORTAINER_IP')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-NETWORK_NAME = "docker_deploy_coders"
+
+
+
+NETWORK_NAME ="code_manager_coders" #NETWORK_NAME = "code_manager_coders" # nombre de la interfaz de red creada por docker
+
+print("antes del error")
+WHASTAPP_API_URL = "http://172.22.0.9:3000/"
+WHASTAPP_API_KEY = "apikey_123"
+WP_ID = "5491130748157@c.us"

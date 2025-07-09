@@ -50,6 +50,7 @@ input {
   display: grid;
   grid-template-columns: 1fr;
   z-index: 5;
+  max-height: 80vh;
 }
 
 form {
@@ -88,7 +89,7 @@ form.sign-in-form {
   height: 55px;
   border-radius: 55px;
   display: grid;
-  
+  grid-template-columns: 15% 85%;
   padding: 0 0.4rem;
   position: relative;
   width: 100vh;
@@ -207,6 +208,7 @@ form.sign-in-form {
 .left-panel {
   pointer-events: all;
   padding: 3rem 17% 2rem 12%;
+  z-index: -1;
 }
 
 .right-panel {
@@ -389,6 +391,7 @@ form.sign-in-form {
 
 }
 
+
 @media (max-width: 570px) {
   form {
     padding: 0 1.5rem;
@@ -401,7 +404,7 @@ form.sign-in-form {
     padding: 0.5rem 1rem;
   }
   .container {
-    padding: 1.5rem;
+    padding: 0 1.5rem;
   }
 
   .container:before {
@@ -453,7 +456,14 @@ table tbody tr:hover {
   background-color: #f1f1f1;
 }
 
+@media (max-height: 600px) {
+  .forms-container{
+    top: 10vh
+  }
+}
+
 @media (max-width: 600px) {
+
   table thead {
     display: none;
   }
@@ -512,9 +522,73 @@ table tbody tr:hover {
     flex-direction: column;
     align-items: center;
     background-color: #04c0fe00;
+    max-height: 15vh;
   }
 
   .menu a {
     margin: 0.5rem 0;
   }
+}
+
+/* Contenedor del dropdown (inicialmente oculto) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+/* Botones dentro del dropdown */
+.dropdown-content button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Mostrar el dropdown cuando se hace clic en el botón */
+.dropdown-content.show {
+  display: block;
+}
+
+/* Botón de tres puntos */
+.dropdown-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 8px;
+}
+
+
+/* Contenedor con scroll */
+.scrollable-container {
+  overflow: auto;    /* Activa el desplazamiento en ambas direcciones cuando sea necesario */
+}
+
+/* Webkit - Estilo del scroll */
+.scrollable-container::-webkit-scrollbar {
+  width: 12px; /* Ajusta el ancho del scroll horizontal */
+  height: 12px; /* Ajusta la altura del scroll vertical */
+}
+
+/* Webkit - Fondo del scroll */
+.scrollable-container::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color de fondo del track */
+  border-radius: 10px; /* Bordes redondeados del track */
+}
+
+/* Webkit - Manija del scroll */
+.scrollable-container::-webkit-scrollbar-thumb {
+  background: #888; /* Color de la manija */
+  border-radius: 10px; /* Bordes redondeados de la manija */
+}
+
+/* Webkit - Manija al pasar el ratón */
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color de la manija al pasar el ratón */
 }

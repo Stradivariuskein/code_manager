@@ -17,21 +17,20 @@
     <div class="container">
       
       <nav class="menu">
-        <a href="#home">Home</a>
-        <a href="#services">Services</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <h1>Dashboard</h1>
+        <form id="logout-form" action="{% url 'logout' %}" method="POST" style="display: none;">
+            {% csrf_token %}
+        </form>
+        <a href="#" onclick="document.getElementById('logout-form').submit();">Cerrar sesión</a>
+    </nav>
+    
       <div class="forms-container">
-        <div class="signin-signup">
-
+        <div class="signin-signup scrollable-container">
+          <h1>Dashboard</h1>
         <div class="content">
           <div class="msj">
             <p id="msj"></p>
           </div>
         <button id="createBtn" onclick="createForm(event)">Crear projecto</button>
-
         <table>
           <thead>
             <tr>
@@ -44,29 +43,13 @@
               <th>Actions</th>
             </tr>
           </thead>
+          <button id="createBtn" onclick="renderProjects()">Refrescar</button>
           <tbody id="projects-table-body">
 
           </tbody>
         </table>
       </div>
-      <!-- <div class="panels-container">
 
-        <div class="panel left-panel">
-
-        </div>
-            <img src="..{% static 'img/log.svg' %}" class="image" alt="">
-        </div>
-
-        <div class="panel right-panel">
-            <div class="content">
-                <h3>One of us?</h3>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio minus natus est.</p>
-                <button class="btn transparent" id="sign-in-btn">Sign In</button>
-            </div>
-            <img src="..{% static 'img/register.svg' %}" class="image" alt="">
-        </div>
-      </div> -->
-      
     </div>
     <script src="..{% static 'app.js' %}"></script>
     <script src="..{% static 'dashboard.js' %}"></script>
