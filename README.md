@@ -50,8 +50,12 @@ Ideal para pruebas rápidas, desarrollo remoto, demostraciones o entornos de ens
 git clone https://github.com/tu-usuario/code_manager.git
 cd code_manager
 
-# 2. Construir y correr los contenedores
-docker-compose up --build
+# 2. Construir y correr los contenedores 
+# windwos:
+install.bat
+
+#linux:
+install.sh
 
 # 3. Acceder al entorno de desarrollo
-# Por defecto: http://localhost:8080
+# Por defecto: http://localhost:10443
