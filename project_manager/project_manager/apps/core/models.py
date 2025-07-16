@@ -167,11 +167,11 @@ class PortainerApi(models.Model):
             "HostConfig": {
                 "NetworkMode": NETWORK_NAME,
                 "PortBindings": { f"{port}/tcp": [{ "HostPort": external_port }] },
-                "Binds": [
-                    f"/home/mrkein/projects/{project_name}/workspace:/home/coder/workspace",
-                    f"/home/mrkein/projects/{project_name}/config:/home/coder/.config",
-                    f"/home/mrkein/projects/{project_name}/certs/cert.pem:/home/coder/.certs/cert.pem",
-                ]
+                # "Binds": [
+                #     f"/home/mrkein/projects/{project_name}/workspace:/home/coder/workspace",
+                #     f"/home/mrkein/projects/{project_name}/config:/home/coder/.config",
+                #     f"/home/mrkein/projects/{project_name}/certs/cert.pem:/home/coder/.certs/cert.pem",
+                # ]
             },
             "Env": [
                 f"PASSWORD={password}",
@@ -303,14 +303,8 @@ class PortainerApi(models.Model):
                 if not existent_container:
                     print(f"\tno existe[{existent_container}]", flush=True)
                     continue
-                    new_container = Container(
-                                            name=name,
-                                            dockerId=container_id,
-                                            imageId=imageId,
-                                            ip=container_ip,
-                                            ports=ports,
-                                            status=status
-                                        )
+            
+            # si exite entonse actualizamos los datos en la db
             if existent_container != None:
                 print(f"\texistent container: {existent_container.name}\n\n\n")
                 new_container = existent_container

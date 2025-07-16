@@ -16,4 +16,4 @@ cd..
 echo ===============================
 echo Starting docker-compose stack...
 echo ===============================
-docker compose up -d
+docker compose --project-name demo_code_manager up -d

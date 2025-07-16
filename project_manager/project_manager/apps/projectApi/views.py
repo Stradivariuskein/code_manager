@@ -86,7 +86,7 @@ class ProjectDeleteView(APIView):
             response = api.delete_container(id)
             print(response)
             if response == True:
-                return Response({'status': 'Project started'}, status=status.HTTP_200_OK)
+                return Response({'status': 'Project deleted'}, status=status.HTTP_200_OK)
             return Response({'error': str(response)}, status=response)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -96,9 +96,8 @@ class ProjectList(generics.ListAPIView):
     serializer_class = ProjectSerializer
 
     def get(self, request, *args, **kwargs):
-        # Llamar a la función que quieres ejecutar antes de listar los proyectos
         api = PortainerApi(apiToken=PORTAINER_TOKEN)
-        api.get_all()
+        api.get_all() #  sincroniza el estado de los contenedores Docker con tu base de datos local
         
         # Luego llamamos al método 'list' que maneja la lógica de listado
         response = super().get(request, *args, **kwargs)

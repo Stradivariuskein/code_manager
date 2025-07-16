@@ -11,16 +11,43 @@ import project_manager.settings as settings
 from .models import Container, PortainerApi, Project, ExposePort, ProjectFactory
 from apps.account.models import PortainerToken
 
+import threading
+from django.core.cache import cache
+from project_manager.portainer_token import PORTAINER_TOKEN
+from datetime import timedelta
+from django.utils.timezone import now
+
+def delete_all():
+    print("[+] Ejecutando delete_all")
+    try:
+        api = PortainerApi(apiToken=PORTAINER_TOKEN)
+        all_containers = api.get_all()
+        for container in all_containers:
+            api.delete_container(container.dockerId)
+
+    except:
+        pass
+    cache.delete("deleteall_scheduled")  # Permitimos programar de nuevo después
+
+
 
 def dashboard(request):
-    # container = Container.objects.filter(name="/test_form").first()
-    # if container:
-    #     project_var = Project.objects.filter(container=container).first()
-    #     container.delete()
-    #     project_var.delete()
 
+    # se verifica q la tarea no este programada para borrar todo
+    if not cache.get("deleteall_scheduled"):
+        print("[+] Programando delete_all dentro de 1 hora")
+        delete_time = now() + timedelta(hours=1)
+        timer = threading.Timer(3600, delete_all)  # 3600s = 1 hora
+        timer.start()
+        cache.set("deleteall_scheduled", True, timeout=3600)
+        cache.set("deleteall_time", delete_time.timestamp(), timeout=3600)
+    
+    delete_time = cache.get("deleteall_time")
+
+    context = {"delete_time": delete_time}
     print(f"view alowed host: {settings.ALLOWED_HOSTS}")
-    return render(request,"dashboard.html")
+    return render(request,"dashboard.html", context)
+
 from django.db.models import Max
 class CreateExposePortView(View):
     def get(self, request):

@@ -66,7 +66,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'whitenoise.middleware.WhiteNoiseMiddleware', # servir staticos
-    'apps.core.middleware.LoginRequiredMiddleware',
+    #'apps.core.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -173,7 +173,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 
-NETWORK_NAME ="code_manager_coders" #NETWORK_NAME = "code_manager_coders" # nombre de la interfaz de red creada por docker
+NETWORK_NAME ="demo_code_manager_coders" #NETWORK_NAME = "code_manager_coders" # nombre de la interfaz de red creada por docker
 
 print("antes del error")
 WHASTAPP_API_URL = "http://172.22.0.9:3000/"
