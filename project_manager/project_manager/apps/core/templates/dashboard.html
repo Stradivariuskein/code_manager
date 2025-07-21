@@ -30,7 +30,11 @@
           <div class="msj">
             <p id="msj"></p>
           </div>
-        <button id="createBtn" onclick="createForm(event)">Crear projecto</button>
+          
+          <button class="action_button" name="modalBtn" onclick="createTokenForm(event)">Cambiar token</button>
+          <button class="action_button" name="modalBtn" onclick="createForm(event)">Crear projecto</button>
+          <button class="action_button" onclick="renderProjects()">Refrescar</button>
+
         <table>
           <thead>
             <tr>
@@ -43,7 +47,7 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <button id="createBtn" onclick="renderProjects()">Refrescar</button>
+          
           <tbody id="projects-table-body">
 
           </tbody>
@@ -53,5 +57,13 @@
     </div>
     <script src="..{% static 'app.js' %}"></script>
     <script src="..{% static 'dashboard.js' %}"></script>
+
+  
+  <style>
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+  </style>
   </body>
 </html>

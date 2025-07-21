@@ -1,14 +1,17 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.views import View
 
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
+from django.core.cache import cache
 import os
 import threading
+import json
 
 from .models import PortainerToken
 def reiniciar_django():
@@ -27,7 +30,7 @@ class LoginOrRegisterView(LoginView):
             username = request.POST.get('username')
             password1 = request.POST.get('password1')
             password2 = request.POST.get('password2')
-            token = request.POST.get('token')  # ⚠️ Asegurate que el input HTML se llama "token"
+            token = request.POST.get('token') 
 
             # Validaciones básicas
             if not username or not password1 or not password2 or not token:
@@ -42,6 +45,8 @@ class LoginOrRegisterView(LoginView):
                 
                 # Guardar el token de Portainer asociado
                 PortainerToken.objects.create(user=user, token=token)
+                # Lo actualizás en caché
+                cache.set("portainer_token", token, timeout=3600)
 
                 # Autenticar
                 login(request, user)
@@ -66,3 +71,24 @@ def firstinit(request):
         return HttpResponseForbidden()
     else:
         return HttpResponse(status=200)
+    
+
+
+class ChangePortainerToken(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            token = data.get("token")
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "JSON inválido"}, status=400)
+
+        token_obj = PortainerToken.objects.first()
+        if not token_obj:
+            return JsonResponse({"error": "No existe un objeto PortainerToken"}, status=404)
+
+        token_obj.token = token
+        token_obj.save()
+
+        cache.set("portainer_token", token, timeout=3600)
+
+        return JsonResponse({"message": "Token actualizado correctamente"}, status=200)
