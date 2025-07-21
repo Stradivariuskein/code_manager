@@ -295,21 +295,17 @@ class PortainerApi(models.Model):
                     ports += f",{ip_data['PublicPort']}"
                 except KeyError:
                     pass
-            print(f"\n\n\n\tcontainer {name} id: {container_id}")
-            existent_container = Container.objects.filter(name=name).first()
-            print(f"container name: {name}")
+            
+            existent_container = Container.objects.filter(dockerId=container_id).first()
             if not existent_container:
-                existent_container = Container.objects.filter(dockerId=container_id).first()
-                if not existent_container:
-                    print(f"\tno existe[{existent_container}]", flush=True)
-                    continue
+                print(f"\tno existe[{existent_container}]", flush=True)
+                continue
             
             # si exite entonse actualizamos los datos en la db
             if existent_container != None:
                 print(f"\texistent container: {existent_container.name}\n\n\n")
                 new_container = existent_container
                 new_container.name = name
-                new_container.dockerId = container_id
                 new_container.imageId = imageId
                 new_container.ip = container_ip
                 new_container.ports = ports

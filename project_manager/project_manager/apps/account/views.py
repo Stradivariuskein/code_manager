@@ -14,8 +14,7 @@ import threading
 import json
 
 from .models import PortainerToken
-def reiniciar_django():
-    threading.Thread(target=lambda: (os._exit(0)), daemon=True).start()
+from apps.core.portainer_token import TIME_TO_DELETE
 class LoginOrRegisterView(LoginView):
     template_name = 'registration/login.html'
     next_page = 'dashboard'
@@ -46,11 +45,10 @@ class LoginOrRegisterView(LoginView):
                 # Guardar el token de Portainer asociado
                 PortainerToken.objects.create(user=user, token=token)
                 # Lo actualizás en caché
-                cache.set("portainer_token", token, timeout=3600)
+                cache.set("portainer_token", token, timeout=TIME_TO_DELETE)
 
                 # Autenticar
                 login(request, user)
-                #reiniciar_django()
                 return redirect(self.next_page)
 
             return render(request, 'registration/register.html')

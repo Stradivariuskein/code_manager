@@ -17,6 +17,8 @@ from .portainer_token import get_p_token
 from datetime import timedelta
 from django.utils.timezone import now
 
+from .portainer_token import TIME_TO_DELETE
+
 def delete_all():
     print("[+] Ejecutando delete_all")
     try:
@@ -36,11 +38,11 @@ def dashboard(request):
     # se verifica q la tarea no este programada para borrar todo
     if not cache.get("deleteall_scheduled"):
         print("[+] Programando delete_all dentro de 1 hora")
-        delete_time = now() + timedelta(hours=1)
-        timer = threading.Timer(3600, delete_all)  # 3600s = 1 hora
+        delete_time = now() + timedelta(seconds=TIME_TO_DELETE)
+        timer = threading.Timer(TIME_TO_DELETE, delete_all)  # 3600s = 1 hora
         timer.start()
-        cache.set("deleteall_scheduled", True, timeout=3600)
-        cache.set("deleteall_time", delete_time.timestamp(), timeout=3600)
+        cache.set("deleteall_scheduled", True, timeout=TIME_TO_DELETE)
+        cache.set("deleteall_time", delete_time.timestamp(), timeout=TIME_TO_DELETE)
     
     delete_time = cache.get("deleteall_time")
 
