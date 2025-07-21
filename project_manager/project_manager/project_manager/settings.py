@@ -161,6 +161,15 @@ EXEMPT_URLS = [
 ]
 
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "portainer_token_cache",
+    }
+}
+
+
+
 # my const
 
 

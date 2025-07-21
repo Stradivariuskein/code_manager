@@ -6,7 +6,7 @@ from apps.account.models import PortainerToken
 from time import sleep
 import requests
 import json
-from project_manager.portainer_token import PORTAINER_TOKEN
+from .portainer_token import get_p_token
 
 
 # try:
@@ -327,7 +327,7 @@ class PortainerApi(models.Model):
         return containers
 
 class Project(models.Model):
-    portApi = PortainerApi(apiToken=PORTAINER_TOKEN)
+    portApi = PortainerApi(apiToken=get_p_token())
     name = models.CharField(max_length=50, unique=True)
     container = models.OneToOneField(Container, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -358,7 +358,7 @@ class ProjectFactory:
             
             if self.validate_port(port):
 
-                portainer_api = PortainerApi(apiToken=PORTAINER_TOKEN)
+                portainer_api = PortainerApi(apiToken=get_p_token())
                 
                 new_container = portainer_api.create_container(name, password, port, enable_https)
 
@@ -413,7 +413,7 @@ class ProjectFactory:
         }
 
         # Crear instancia de la API
-        portainer_api = PortainerApi(apiToken=PORTAINER_TOKEN)
+        portainer_api = PortainerApi(apiToken=get_p_token())
 
         # Crear contenedor
         # try:

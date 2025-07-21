@@ -4,7 +4,7 @@ from .serializers import ProjectSerializer, ContainerSerializer, ProjectFactoryS
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from project_manager.portainer_token import PORTAINER_TOKEN
+from apps.core.portainer_token import get_p_token
 
 
 
@@ -23,7 +23,7 @@ class ProjectCreateView(APIView):
 
             password = serializer.validated_data.get('password', '123q123q')
             port = serializer.validated_data['port']
-            enable_https = serializer.validated_data['enable_https']
+            enable_https = False #enable_https = serializer.validated_data['enable_https']
             print(f"""                      name: {name}
                     pass: {password}
                     port: {port}
@@ -45,7 +45,7 @@ class ProjectStartView(APIView):
     def post(self, request, id):
         # Lógica para iniciar el proyecto
         try:
-            api = PortainerApi(apiToken=PORTAINER_TOKEN)
+            api = PortainerApi(apiToken=get_p_token())
             response = api.run_container(id)
             if response == True:
                 return Response({'status': 'Project started'}, status=status.HTTP_200_OK)
@@ -57,7 +57,7 @@ class ProjectStopView(APIView):
     def post(self, request, id):
         # Lógica para detener el proyecto
         try:
-            api = PortainerApi(apiToken=PORTAINER_TOKEN)
+            api = PortainerApi(apiToken=get_p_token())
             response = api.stop_container(id)
             if response == True:
                 return Response({'status': 'Project started'}, status=status.HTTP_200_OK)
@@ -69,7 +69,7 @@ class ProjectRestartView(APIView):
     def post(self, request, id):
         # Lógica para reiniciar el proyecto
         try:
-            api = PortainerApi(apiToken=PORTAINER_TOKEN)
+            api = PortainerApi(apiToken=get_p_token())
             response = api.restart_container(id)
             if response == True:
                 return Response({'status': 'Project started'}, status=status.HTTP_200_OK)
@@ -82,7 +82,7 @@ class ProjectDeleteView(APIView):
         
         # Lógica para eliminar el proyecto
         try:
-            api = PortainerApi(apiToken=PORTAINER_TOKEN)
+            api = PortainerApi(apiToken=get_p_token())
             response = api.delete_container(id)
             print(response)
             if response == True:
@@ -96,7 +96,7 @@ class ProjectList(generics.ListAPIView):
     serializer_class = ProjectSerializer
 
     def get(self, request, *args, **kwargs):
-        api = PortainerApi(apiToken=PORTAINER_TOKEN)
+        api = PortainerApi(apiToken=get_p_token())
         api.get_all() #  sincroniza el estado de los contenedores Docker con tu base de datos local
         
         # Luego llamamos al método 'list' que maneja la lógica de listado

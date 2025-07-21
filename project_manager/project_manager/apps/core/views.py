@@ -13,14 +13,14 @@ from apps.account.models import PortainerToken
 
 import threading
 from django.core.cache import cache
-from project_manager.portainer_token import PORTAINER_TOKEN
+from .portainer_token import get_p_token
 from datetime import timedelta
 from django.utils.timezone import now
 
 def delete_all():
     print("[+] Ejecutando delete_all")
     try:
-        api = PortainerApi(apiToken=PORTAINER_TOKEN)
+        api = PortainerApi(apiToken=get_p_token())
         all_containers = api.get_all()
         for container in all_containers:
             api.delete_container(container.dockerId)

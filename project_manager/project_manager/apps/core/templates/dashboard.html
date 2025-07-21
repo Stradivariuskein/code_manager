@@ -23,18 +23,19 @@
         <a href="#" onclick="document.getElementById('logout-form').submit();">Cerrar sesión</a>
     </nav>
     <div id="countdown-box" style="
-      background-color: #f44336;
-      color: white;
-      padding: 10px 20px;
-      font-weight: bold;
-      display: inline-block;
-      border-radius: 8px;
-      font-family: monospace;
-      right: 10px;
-      margin-top: 10px;
-      position: absolute;
-      z-index: 10;
-    "></div>
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    font-weight: bold;
+    display: inline-block;
+    border-radius: 8px;
+    font-family: monospace;
+    right: 10px;
+    margin-top: 10px;
+    position: absolute;
+    z-index: 10;
+  "></div>
+    
       <div class="forms-container">
         <div class="signin-signup scrollable-container">
           <h1>Dashboard</h1>
@@ -42,7 +43,12 @@
           <div class="msj">
             <p id="msj"></p>
           </div>
-        <button id="createBtn" onclick="createForm(event)">Crear projecto</button>
+          
+          <button class="action_button" name="modalBtn" onclick="createTokenForm(event)">Cambiar token</button>
+          <button class="action_button" name="modalBtn" onclick="createForm(event)">Crear projecto</button>
+          <button class="action_button" onclick="renderProjects()">Refrescar</button>
+
+
         <table>
           <thead>
             <tr>
@@ -55,7 +61,7 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <button id="createBtn" onclick="renderProjects()">Refrescar</button>
+          
           <tbody id="projects-table-body">
 
           </tbody>
@@ -70,5 +76,13 @@
     </script>
     <script src="..{% static 'contador.js' %}"></script>
     
+
+  
+  <style>
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+  </style>
   </body>
 </html>
