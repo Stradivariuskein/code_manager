@@ -10,7 +10,7 @@ services:
       - ./nginx_proxy/default.conf:/etc/nginx/conf.d/default.conf.template
       - ./nginx_proxy/certs:/etc/nginx/certs
     ports:
-      - "10443:443"
+      - "11004:443"
     networks:
       manager:
         ipv4_address: 172.22.0.2 # ip to host
@@ -33,7 +33,7 @@ services:
         - "9443:9443"
       networks:
         manager:
-          ipv4_address: 172.22.0.4
+          ipv4_address: 172.22.0.6
 
 
   web:
@@ -50,7 +50,7 @@ services:
         ipv4_address: 172.22.0.3
     environment:
       - PROXY_IP=172.22.0.2
-      - PORTAINER_IP=172.22.0.4
+      - PORTAINER_IP=172.22.0.6
       
 
 # Red con los servicios principales
