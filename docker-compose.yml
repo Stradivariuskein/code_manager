@@ -33,7 +33,7 @@ services:
   #       - "9443:9443"
   #     networks:
   #       manager:
-  #         ipv4_address: 172.32.0.4
+  #         ipv4_address: 172.32.0.6
 
 
   demo_web:
@@ -52,7 +52,7 @@ services:
         ipv4_address: 172.22.0.10
     environment:
       - PROXY_IP=172.32.0.2
-      - PORTAINER_IP=172.22.0.4
+      - PORTAINER_IP=172.22.0.6
       
 
 # Red con los servicios principales
